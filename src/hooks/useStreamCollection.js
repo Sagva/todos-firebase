@@ -25,11 +25,6 @@ const useStreamCollection = (name) => {
 					(a, b) => a.addedTime?.valueOf() - b.addedTime?.valueOf()
 				);
 
-			// if(a.addedTime.valueOf() > b.addedTime.valueOf()) {
-			//     return -1
-			// }
-
-			// console.log(`data`,data)
 			setCollectionData(data), setLoading(false);
 		});
 

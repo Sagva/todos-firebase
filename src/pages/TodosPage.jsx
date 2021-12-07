@@ -63,10 +63,21 @@ const TodosPage = () => {
 				<ListGroup>
 					{collectionData.map((todo, index) => (
 						<div
-							style={{ display: "flex", marginBottom: 5 }}
+							style={{
+								display: "flex",
+								marginBottom: 5,
+							}}
 							key={index}
 						>
-							<ListGroup.Item action href={`/todos/${todo.id}`}>
+							<ListGroup.Item
+								action
+								href={`/todos/${todo.id}`}
+								style={{
+									textDecoration: todo.completed
+										? "line-through"
+										: "none",
+								}}
+							>
 								{todo.title}
 								<p style={{ fontSize: 12 }}>
 									Added:
