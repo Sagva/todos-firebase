@@ -5,10 +5,12 @@ import { useForm } from "react-hook-form";
 // import { doc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { collection, addDoc } from "firebase/firestore";
+import useStreamCollection from "../hooks/useStreamCollection";
 
 const TodosPage = () => {
 	// const {todos, loading} = useGetToods()
-	const { collectionData, loading, getData } = useGetCollection("todos");
+	// const { collectionData, loading, getData } = useGetCollection("todos");
+	const { collectionData, loading } = useStreamCollection("todos");
 
 	useEffect(() => {
 		console.log(`collectionData`, collectionData);
@@ -33,7 +35,7 @@ const TodosPage = () => {
 		});
 
 		console.log("Document written with ID: ", docRef.id);
-		getData();
+
 		setTitle("");
 		reset();
 	};
@@ -42,13 +44,6 @@ const TodosPage = () => {
 		<Container className="py-3">
 			<div className="d-flex justify-content-between align-items-center mb-3">
 				<h1>Todos</h1>
-				<Button
-					onClick={() => {
-						getData();
-					}}
-				>
-					Refresh
-				</Button>
 			</div>
 
 			{loading && <p>Loading...</p>}

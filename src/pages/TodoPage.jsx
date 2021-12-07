@@ -5,16 +5,15 @@ import useGetDocument from "../hooks/useGetDocument";
 // import useGetTood from '../hooks/useGetTodo'
 import { db } from "../firebase";
 import { doc, updateDoc, deleteDoc } from "firebase/firestore";
+import useStreamDocument from "../hooks/useStreamDocument";
 
 const TodoPage = () => {
 	const { id } = useParams();
 	// const {todo, loading} = useGetTood(id)
-	const { document: todo, loading, getData } = useGetDocument("todos", id);
+	// const { document: todo, loading, getData } = useGetDocument("todos", id);
+	const { data: todo, loading } = useStreamDocument("todos", id);
 
 	const navigate = useNavigate();
-	useEffect(() => {
-		console.log(`id`, id);
-	}, [id]);
 
 	const deleteTodo = async () => {
 		if (id) {
@@ -23,7 +22,6 @@ const TodoPage = () => {
 
 			navigate("/todos", { replace: true });
 		}
-		// getData();
 	};
 	const toggleTodo = async () => {
 		if (id) {
@@ -31,9 +29,8 @@ const TodoPage = () => {
 			await updateDoc(ref, {
 				completed: !todo.completed,
 			});
-			getData("todos", id);
+			// getData("todos", id);
 		}
-		// getData();
 	};
 	return (
 		<Container className="py-3">
@@ -47,13 +44,6 @@ const TodoPage = () => {
 						{todo.completed
 							? `todo is done 😊 `
 							: `todo is not done yet 😥`}
-						<Button
-							onClick={() => {
-								getData("todos", id);
-							}}
-						>
-							Refresh
-						</Button>
 					</div>
 					<ButtonGroup className="todo-actions">
 						<Button variant="primary" onClick={toggleTodo}>
