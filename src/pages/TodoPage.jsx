@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router";
 import useGetDocument from "../hooks/useGetDocument";
 // import useGetTood from '../hooks/useGetTodo'
 import { db } from "../firebase";
-import { doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { doc, updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
 import useStreamDocument from "../hooks/useStreamDocument";
 
 const TodoPage = () => {
@@ -26,10 +26,13 @@ const TodoPage = () => {
 	const toggleTodo = async () => {
 		if (id) {
 			const ref = doc(db, "todos", id);
-			await updateDoc(ref, {
+			// await updateDoc(ref, {
+			// 	completed: !todo.completed,
+			// });
+			const updateTimestamp = await updateDoc(ref, {
 				completed: !todo.completed,
+				changedTime: serverTimestamp(),
 			});
-			// getData("todos", id);
 		}
 	};
 	return (
@@ -38,12 +41,33 @@ const TodoPage = () => {
 			{todo && (
 				<>
 					{" "}
-					<div className="d-flex justify-content-between align-items-center mb-3">
+					<div className="d-flex flex-column justify-content-between align-items-start mb-3">
 						<h1>{todo.title}</h1>
+						<p style={{ fontSize: 12 }}>
+							Added:
+							{todo.addedTime?.seconds && (
+								<span className="mx-3">
+									{`${new Date(
+										todo.addedTime?.seconds * 1000
+									)}`}
+								</span>
+							)}
+						</p>
+
+						<p style={{ fontSize: 12 }}>
+							Changed:
+							{todo.changedTime && todo.changedTime.seconds && (
+								<span className="mx-3">
+									{`${new Date(
+										todo.changedTime?.seconds * 1000
+									)}`}
+								</span>
+							)}
+						</p>
 
 						{todo.completed
-							? `todo is done 😊 `
-							: `todo is not done yet 😥`}
+							? `Todo is done 😊 `
+							: `Todo is not done yet 😥`}
 					</div>
 					<ButtonGroup className="todo-actions">
 						<Button variant="primary" onClick={toggleTodo}>
