@@ -4,20 +4,12 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthContext } from '../contexts/AuthContext'
 
 const LogoutPage = () => {
+	const { logout } = useAuthContext()
 	const navigate = useNavigate()
-	const { logout,  user  } = useAuthContext()
 
 	useEffect(async () => {
-		try {
-			logout()
-			
-			setTimeout(()=> {
-				navigate('/')
-			}, 3000)
-		} catch (e) {
-			console.log(`error`, e)
-		} 
-		
+		await logout()
+		navigate('/')
 	}, [])
 
 	return (
@@ -28,7 +20,7 @@ const LogoutPage = () => {
 						<Card.Body>
 							<Card.Title>Log Out</Card.Title>
 
-							{user ? <Card.Text>Please wait while you're being logged out...</Card.Text> : <Card.Text>You were logged out... You are going to be redirected to the main page</Card.Text>}
+							<Card.Text>Please wait while you're being logged out...</Card.Text>
 						</Card.Body>
 					</Card>
 				</Col>

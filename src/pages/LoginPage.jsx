@@ -8,12 +8,14 @@ const LoginPage = () => {
 	const passwordRef = useRef()
 	const [error, setError] = useState(null)
 	const [loading, setLoading] = useState(false)
-	const navigate = useNavigate()
 	const { login } = useAuthContext()
+	const navigate = useNavigate()
 
 	const handleSubmit = async (e) => {
 		e.preventDefault()
 		setError(null);
+
+		// try to login the user with the specified credentials
 		try {
 			setLoading(true)
 			await login(emailRef.current.value, passwordRef.current.value)
@@ -23,7 +25,6 @@ const LoginPage = () => {
 			setError(e.message)
 			setLoading(false)
 		}
-
 	}
 
 	return (

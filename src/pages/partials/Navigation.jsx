@@ -3,46 +3,47 @@ import { Link, NavLink } from 'react-router-dom'
 import Container from 'react-bootstrap/Container'
 import Nav from 'react-bootstrap/Nav'
 import Navbar from 'react-bootstrap/Navbar'
+import NavDropdown from 'react-bootstrap/NavDropdown'
 import { useAuthContext } from '../../contexts/AuthContext'
 
-
 const Navigation = () => {
-	const { user } = useAuthContext()
+	const { currentUser } = useAuthContext()
 
 	useEffect(() => {
-		console.log(`user in Navigator`, user)
-	}, [user]);
+		console.log(`currentUser`, currentUser)
+	}, [currentUser]);
+
 	return (
 		<Navbar bg="dark" variant="dark" expand="md">
 			<Container>
 				<Link to="/" className="navbar-brand">
 					<span role="img" aria-label="A note with a pen">📝</span> Firestore Todos
 				</Link>
-				
 
 				<Navbar.Toggle aria-controls="basic-navbar-nav" />
-				<Navbar.Collapse id="basic-navbar-nav" >
-					<Nav>
+				<Navbar.Collapse id="basic-navbar-nav">
+					<Nav className="ms-auto">
 
-						<NavLink to="/todos" className="nav-link">Todos</NavLink>
+						{
+							currentUser ? (
+								<>
+									<NavLink to="/todos" className="nav-link">Todos</NavLink>
 
-					</Nav>
-					<Nav>
+									<NavDropdown title={currentUser.displayName || currentUser.email} id="basic-nav-dropdown">
+										<NavLink to="/update-profile" className="dropdown-item">Update Profile</NavLink>
+										<NavDropdown.Divider />
+										<NavLink to="/logout" className="dropdown-item">Log Out</NavLink>
+									</NavDropdown>
+								</>
+							) : (
+								<>
+									<NavLink to="/login" className="nav-link">Login</NavLink>
+									<NavLink to="/signup" className="nav-link">Signup</NavLink>
+								</>
+							)
+						}
 
-						<NavLink to="/login" className="nav-link">Login</NavLink>
 
-					</Nav>
-					<Nav>
-
-						<NavLink to="/signup" className="nav-link">Signup</NavLink>
-
-					</Nav>
-					{user && <Nav>
-						<NavLink to="/logout" className="nav-link">logout</NavLink>
-					</Nav> }
-					<Nav>
-
-						{user && <span className="nav-link" >{user} </span>}
 
 					</Nav>
 				</Navbar.Collapse>

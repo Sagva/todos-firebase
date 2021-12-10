@@ -1,5 +1,14 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut  } from 'firebase/auth'
+import {
+	createUserWithEmailAndPassword,
+	onAuthStateChanged,
+	signInWithEmailAndPassword,
+	signOut,
+	updateProfile,
+	updateEmail,
+	updatePassword 
+} from 'firebase/auth'
+import { PacmanLoader } from 'react-spinners'
 import { auth } from '../firebase'
 
 const AuthContext = createContext()
@@ -9,54 +18,91 @@ const useAuthContext = () => {
 }
 
 const AuthContextProvider = ({ children }) => {
-
-	const [user, setUser] = useState()
-	const [isLoggedin, setIsLoggedin] = useState(false)
-	
-
-	onAuthStateChanged(auth, (user) => {
-		if (user) {
-			setUser(user.email)
-			setIsLoggedin(true)
-			console.log(`user`, user)
-		  // User is signed in, see docs for a list of available properties
-		  // https://firebase.google.com/docs/reference/js/firebase.User
-		//   const uid = user.uid;
-		  // ...
-		} else {
-			setIsLoggedin(false)
-		  // User is signed out
-		  // ...
-		  setUser(null)
-		}
-	  });
+	const [currentUser, setCurrentUser] = useState(null)
+	const [loading, setLoading] = useState(true)
 
 	const signup = (email, password) => {
 		return createUserWithEmailAndPassword(auth, email, password)
 	}
-	const login = async (email, password) => {
-		await signInWithEmailAndPassword(auth, email, password)
-		
-	}
-	
 
-	const logout = ()=> {
-		signOut(auth)
+	const login = (email, password) => {
+		return signInWithEmailAndPassword(auth, email, password)
+	}
+
+	const logout = () => {
+		return signOut(auth)
+	}
+
+	// add auth-state-observer here (somehow... 😈)
+	useEffect(() => {
+		// listen for auth-state changes
+		onAuthStateChanged(auth, (user) => {
+			setCurrentUser(user)
+			setLoading(false)
+		})
+	}, [])
+
+	useEffect(() => {
+		console.log(`currentUser`, currentUser)
+	}, [currentUser]);
+
+	const updateUserName = (newName) =>{
+		updateProfile(auth.currentUser, {
+			displayName: newName
+		  }).then(() => {
+			// Profile updated!
+			console.log(`User Name was updated!`)
+			setCurrentUser(auth.currentUser)
+			
+			// ...
+		  }).catch((error) => {
+			// An error occurred
+			console.log(`An error occurred while changing name!`, error)
+		  });
+	}
+	const updateUserEmail = (newEmail) =>{
+		updateEmail(auth.currentUser, newEmail).then(() => {
+			// Profile updated!
+			console.log(`Email was updated!`)
+			setCurrentUser(auth.currentUser)
+			// ...
+		  }).catch((error) => {
+			// An error occurred
+			console.log(`An error occurred while changing email!`, error)
+		  });
+	}
+	const updateUserPassword =  (newPassword) =>{
+		updatePassword(auth.currentUser, newPassword).then(() => {
+			// Profile updated!
+			console.log(`Password was updated!`)
+			setCurrentUser(auth.currentUser)
+			// ...
+		  }).catch((error) => {
+			// An error occurred
+			console.log(`An error occurred while changing password!`, error)
+		  });
 	}
 
 	const contextValues = {
 		// here be everything the children needs/should be able to use
-		signup,
+		currentUser,
+		loading,
 		login,
-		user,
 		logout,
-		setUser,
-		isLoggedin
+		signup,
+		updateUserName,
+		updateUserEmail,
+		updateUserPassword
 	}
 
 	return (
 		<AuthContext.Provider value={contextValues}>
-			{children}
+			{loading && (
+				<div id="spinner">
+					<PacmanLoader color={"#888"} size={50} />
+				</div>
+			)}
+			{!loading && children}
 		</AuthContext.Provider>
 	)
 }
