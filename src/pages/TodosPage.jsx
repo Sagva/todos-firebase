@@ -1,125 +1,75 @@
-import React, { useEffect, useState } from "react";
-import { Button, Container, ListGroup } from "react-bootstrap";
-import useGetCollection from "../hooks/useGetCollection";
-import { useForm } from "react-hook-form";
-// import { doc, setDoc } from "firebase/firestore";
-import { db } from "../firebase";
-import {
-	collection,
-	addDoc,
-	serverTimestamp,
-	doc,
-	deleteDoc,
-} from "firebase/firestore";
-import useStreamCollection from "../hooks/useStreamCollection";
+import React from 'react'
+import { collection, orderBy, query } from 'firebase/firestore'
+import { Button, Container, ListGroup } from 'react-bootstrap'
+import { Link } from 'react-router-dom'
+import { useFirestoreQueryData } from '@react-query-firebase/firestore'
+import CreateNewTodoForm from '../components/CreateNewTodoForm'
+import useGetTodos from '../hooks/useGetTodos'
+import { firebaseTimestampToString } from '../helpers/time'
+import { db } from '../firebase'
+import { useAuthContext } from '../contexts/AuthContext'
+import ClipLoader from "react-spinners/ClipLoader";
 
 const TodosPage = () => {
-	// const {todos, loading} = useGetToods()
-	// const { collectionData, loading, getData } = useGetCollection("todos");
-	const { collectionData, loading } = useStreamCollection("todos");
-
-	useEffect(() => {
-		console.log(`collectionData`, collectionData);
-	}, [collectionData]);
-	const {
-		register,
-		handleSubmit,
-		formState: { errors },
-		reset,
-	} = useForm();
-
-	const [title, setTitle] = useState();
-
-	const onSubmit = async (data, e) => {
-		setTitle(data.title);
-		const docRef = await addDoc(collection(db, "todos"), {
-			title: data.title,
-			completed: false,
-			addedTime: serverTimestamp(),
-		});
-
-		console.log("Document written with ID: ", docRef.id);
-
-		setTitle("");
-		reset();
-	};
-
-	const deleteTodo = async (id) => {
-		if (id) {
-			const ref = doc(db, "todos", id);
-			await deleteDoc(ref);
-		}
-	};
+	// const { data, loading } = useGetTodos()
+	const { user, isLoggedin } = useAuthContext()
+	const queryRef = query(
+		collection(db, 'todos'),
+		orderBy('timestamp')
+	)
+	const { data, isLoading } = useFirestoreQueryData(['todos'], queryRef, {
+		subscribe: true,
+	})
 
 	return (
-		<Container className="py-3">
-			<div className="d-flex justify-content-between align-items-center mb-3">
-				<h1>Todos</h1>
+		 <Container className="py-3">
+
+			{user ?
+				
+				<div>
+				<div className="d-flex justify-content-between align-items-center mb-3">
+					<h1>Todos</h1>
+				</div>
+	
+				{isLoading && <p>Loading...</p>}
+	
+				{data && <>
+					{data.length
+						?
+							<ListGroup>
+								{data.map((todo, index) => {
+									const timestamp = firebaseTimestampToString(todo.timestamp)
+									const statusClass = todo.completed ? 'completed' : 'not-completed'
+	
+									return (
+										<ListGroup.Item as={Link} action to={`/todos/${todo.id}`} className={`${statusClass} d-flex justify-content-between align-items-center`} key={index}>
+											<span>{todo.title}</span>
+											<div className="timestamp">
+												{timestamp ?? '-'}
+											</div>
+										</ListGroup.Item>
+									)
+								})}
+							</ListGroup>
+						: <p>Yay, you have NO todos 🥳!</p>
+					}
+				</>}
+	
+				<hr className="my-4" />
+	
+				<h2>Got moar to do? 😭</h2>
+				<CreateNewTodoForm />
 			</div>
-
-			{loading && <p>Loading...</p>}
-
-			{collectionData && (
-				<ListGroup>
-					{collectionData.map((todo, index) => (
-						<div
-							style={{
-								display: "flex",
-								marginBottom: 5,
-							}}
-							key={index}
-						>
-							<ListGroup.Item
-								action
-								href={`/todos/${todo.id}`}
-								style={{
-									textDecoration: todo.completed
-										? "line-through"
-										: "none",
-								}}
-							>
-								{todo.title}
-								<p style={{ fontSize: 12 }}>
-									Added:
-									{todo.addedTime?.seconds && (
-										<span className="mx-3">
-											{`${new Date(
-												todo.addedTime?.seconds * 1000
-											)}`}
-										</span>
-									)}
-								</p>
-							</ListGroup.Item>
-							<button
-								onClick={() => deleteTodo(todo.id)}
-								style={{
-									height: "35px",
-									borderRadius: "5px",
-									backgroundColor: "LightSlateGrey",
-								}}
-							>
-								Delete
-							</button>
-						</div>
-					))}
-				</ListGroup>
-			)}
-
-			<form onSubmit={handleSubmit(onSubmit)} style={{ marginTop: 20 }}>
-				{/* register your input into the hook by invoking the "register" function */}
-				<input
-					defaultValue={title}
-					style={{ border: "1px solid light-gray", padding: 5 }}
-					{...register("title", { required: true })}
-					placeholder="Enter book title"
-				/>
-
-				{/* errors will return when field validation fails  */}
-				{errors.title && <span>This field is required</span>}
-				<input type="submit" style={{ marginLeft: 20 }} />
-			</form>
+			:
+			<div>
+				Please Log in to see the todos
+				<ClipLoader loading={user} size={50} />
+    
+			</div>
+}
 		</Container>
-	);
-};
+				
+		)
+}
 
-export default TodosPage;
+export default TodosPage

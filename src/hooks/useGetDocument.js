@@ -1,34 +1,37 @@
-import { useEffect, useState } from "react";
-import { db } from "../firebase";
-import { getDoc, doc } from "firebase/firestore";
+import { useEffect, useState } from 'react'
+import { db } from '../firebase'
+import { doc, getDoc } from 'firebase/firestore'
 
-const useGetDocument = (collectionName, id) => {
-	const [loading, setLoading] = useState(true);
+const useGetDocument = (col, id) => {
+	const [loading, setLoading] = useState(true)
+	const [data, setData] = useState()
 
-	const [document, setDocument] = useState();
+	const getData = async () => {
+		setLoading(true)
 
-	useEffect(() => {
-		getData(collectionName, id);
-	}, [id, collectionName]);
+		// get document reference
+		const ref = doc(db, col, id)
+		const snapshot = await getDoc(ref)
 
-	const getData = async (collectionName, id) => {
-		setLoading(true);
-		//get document reference
-
-		const ref = doc(db, collectionName, id);
-		const snapshot = await getDoc(ref);
-
-		// console.log(`snapshot`, snapshot.data());
-		if (!snapshot) {
-			setDocument(false);
-			return;
+		if (!snapshot.exists()) {
+			setData(false)
+			setLoading(false)
+			return
 		}
 
-		setDocument(snapshot.data());
-		setLoading(false);
-	};
+		setData(snapshot.data())
+		setLoading(false)
+	}
 
-	return { loading, document, getData };
-};
+	useEffect(() => {
+		getData()
+	}, [id])
 
-export default useGetDocument;
+	return {
+		getData,
+		loading,
+		data,
+	}
+}
+
+export default useGetDocument

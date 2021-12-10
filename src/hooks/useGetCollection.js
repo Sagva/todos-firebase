@@ -1,37 +1,36 @@
-import { db } from "../firebase";
-import { collection, getDocs } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react'
+import { db } from '../firebase'
+import { collection, getDocs } from 'firebase/firestore'
 
-const useGetCollection = (name) => {
-	const [collectionData, setCollectionData] = useState([]);
-	const [loading, setLoading] = useState(true);
-
-	useEffect(() => {
-		getData();
-	}, []);
+const useGetCollection = (col) => {
+	const [data, setData] = useState()
+	const [loading, setLoading] = useState(true)
 
 	const getData = async () => {
-		setLoading(true);
-		//get reference to collection todos
-		const ref = collection(db, name);
+		// get reference to collection
+		const ref = collection(db, col)
+		const snapshot = await getDocs(ref)
 
-		const snapshot = await getDocs(ref);
-
-		const data = snapshot.docs.map((doc) => {
+		const data = snapshot.docs.map(doc => {
 			return {
 				id: doc.id,
-				...doc.data(), //title, complited
-			};
-		});
-		// console.log(`data`,data)
-		setCollectionData(data), setLoading(false);
-	};
+				...doc.data() // title, completed
+			}
+		})
+
+		setData(data)
+		setLoading(false)
+	}
+
+	useEffect(() => {
+		getData()
+	}, [])
 
 	return {
-		loading,
-		collectionData,
 		getData,
-	};
-};
+		loading,
+		data,
+	}
+}
 
-export default useGetCollection;
+export default useGetCollection
