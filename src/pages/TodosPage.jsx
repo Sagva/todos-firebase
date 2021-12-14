@@ -85,7 +85,7 @@ const TodosPage = () => {
 										<span className="mx-3">
 											{`${new Date(
 												todo.addedTime?.seconds * 1000
-											)}`}
+											).toLocaleString()}`}
 										</span>
 									)}
 								</p>
