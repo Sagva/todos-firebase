@@ -15,24 +15,12 @@ const useAuthContext = () => {
 
 const AuthContextProvider = ({ children }) => {
 	const [user, setUser] = useState();
-	const [isLoggedin, setIsLoggedin] = useState(false);
 
-	onAuthStateChanged(auth, (user) => {
-		if (user) {
-			setUser(user.email);
-			setIsLoggedin(true);
-			// console.log(`user`, user)
-			// User is signed in, see docs for a list of available properties
-			// https://firebase.google.com/docs/reference/js/firebase.User
-			//   const uid = user.uid;
-			// ...
-		} else {
-			setIsLoggedin(false);
-			// User is signed out
-			// ...
-			setUser(null);
-		}
-	});
+	useEffect(() => {
+		onAuthStateChanged(auth, (user) => {
+			setUser(user);
+		});
+	}, []);
 
 	const signup = (email, password) => {
 		return createUserWithEmailAndPassword(auth, email, password);
@@ -52,7 +40,6 @@ const AuthContextProvider = ({ children }) => {
 		user,
 		logout,
 		setUser,
-		isLoggedin,
 	};
 
 	return (

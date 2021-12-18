@@ -12,7 +12,7 @@ import ClipLoader from "react-spinners/ClipLoader";
 
 const TodosPage = () => {
 	// const { data, loading } = useGetTodos()
-	const { user, isLoggedin } = useAuthContext()
+	const { user } = useAuthContext()
 	const queryRef = query(
 		collection(db, 'todos'),
 		orderBy('timestamp')
