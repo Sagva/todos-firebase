@@ -28,7 +28,7 @@ const Navigation = () => {
 							Todos
 						</NavLink>
 
-						{!user && (
+						{/* {!user && (
 							<NavLink to="/login" className="nav-link">
 								Login
 							</NavLink>
@@ -46,7 +46,25 @@ const Navigation = () => {
 							</NavLink>
 						)}
 
-						{user && <span className="nav-link">{user.email} </span>}
+						{user && <span className="nav-link">{user.email} </span>} */}
+
+						{user ? (
+							<>
+								<NavLink to="/logout" className="nav-link">
+									logout
+								</NavLink>
+								<span className="nav-link">{user.email} </span>
+							</>
+						) : (
+							<>
+								<NavLink to="/login" className="nav-link">
+									Login
+								</NavLink>
+								<NavLink to="/signup" className="nav-link">
+									Signup
+								</NavLink>
+							</>
+						)}
 					</Nav>
 				</Navbar.Collapse>
 			</Container>
