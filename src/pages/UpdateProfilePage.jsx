@@ -2,19 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { Row, Col, Form, Button, Card, Alert } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthContext } from "../contexts/AuthContext";
-import { auth } from "../firebase";
-import {
-	getAuth,
-	updateEmail,
-	updateProfile,
-	updatePassword,
-} from "firebase/auth";
 
 const UpdateProfilePage = () => {
-	useEffect(() => {
-		console.log(`auth`, auth);
-	}, [auth]);
-
 	const displayNameRef = useRef();
 	const emailRef = useRef();
 	const passwordRef = useRef();
@@ -23,7 +12,8 @@ const UpdateProfilePage = () => {
 	const [error, setError] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [message, setMessage] = useState(null);
-	const { setCurrentUser } = useAuthContext();
+	const { currentUser, setDisplayName, setEmail, setPassword } =
+		useAuthContext();
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -41,86 +31,25 @@ const UpdateProfilePage = () => {
 			setLoading(true);
 
 			// update displayName *ONLY* if it has changed
-			if (displayNameRef.current.value) {
-				const updatedAuth = getAuth();
-				updateProfile(updatedAuth.currentUser, {
-					displayName: displayNameRef.current.value,
-				})
-					.then(() => {
-						console.log(
-							`User Name was updated to`,
-							displayNameRef.current.value
-						);
-						setLoading(false);
-						displayNameRef.current.value = "";
-						setMessage("User Name was updated!");
-					})
-					.catch((error) => {
-						// An error occurred
-						console.log(
-							`An error occurred while changing name!`,
-							error
-						);
-					});
+			if (displayNameRef.current.value !== currentUser.displayName) {
+				await setDisplayName(displayNameRef.current.value);
 			}
 
 			// update email *ONLY* if it has changed
-			if (emailRef.current.value) {
-				const updatedAuth = getAuth();
-				updateEmail(updatedAuth.currentUser, emailRef.current.value)
-					.then(() => {
-						// Profile updated!
-						console.log(
-							`Email was updated to`,
-							emailRef.current.value
-						);
-						setCurrentUser(auth.currentUser);
-						setLoading(false);
-						emailRef.current.value = "";
-						setMessage("Email was updated!");
-					})
-					.catch((error) => {
-						// An error occurred
-						console.log(
-							`An error occurred while changing email!`,
-							error
-						);
-					});
+			if (emailRef.current.value !== currentUser.email) {
+				await setEmail(emailRef.current.value);
 			}
 
 			// update password *ONLY* if the user has provided a new password to set
-			if (
-				passwordRef.current.value.length >= 6 &&
-				passwordConfirmRef.current.value.length >= 6 &&
-				passwordRef.current.value === passwordConfirmRef.current.value
-			) {
-				console.log(`inside change password if`);
-				const updatedAuth = getAuth();
-				updatePassword(
-					updatedAuth.currentUser,
-					passwordRef.current.value
-				)
-					.then(() => {
-						setLoading(false);
-						passwordRef.current.value = "";
-						passwordConfirmRef.current.value = "";
-						console.log(`Password was updated!`);
-						setMessage("Password was updated!");
-					})
-					.catch((error) => {
-						// An error occurred
-						console.log(
-							`An error occurred while changing password!`,
-							error
-						);
-					});
+			if (passwordRef.current.value) {
+				await setPassword(passwordRef.current.value);
 			}
 
 			// when all tasks are done, show a message to the user that everything has been saved
+			setMessage("Profile sussessfully updated!");
+			setLoading(false);
 		} catch (e) {
-			setError(
-				`Error ${e} updating profile. Try logging out and in again.`
-			);
+			setError(`Error ${e} updating profile.`);
 			setLoading(false);
 		}
 	};

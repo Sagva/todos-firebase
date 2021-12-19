@@ -7,6 +7,7 @@ import {
 	updateProfile,
 	updateEmail,
 	updatePassword,
+	sendPasswordResetEmail,
 } from "firebase/auth";
 import { PacmanLoader } from "react-spinners";
 import { auth } from "../firebase";
@@ -32,6 +33,23 @@ const AuthContextProvider = ({ children }) => {
 	const logout = () => {
 		return signOut(auth);
 	};
+	const resetPassword = (email) => {
+		return sendPasswordResetEmail(auth, email)
+	}
+
+	const setEmail = (newEmail) => {
+		return updateEmail(currentUser, newEmail)
+	}
+
+	const setPassword = (newPassword) => {
+		return updatePassword(currentUser, newPassword)
+	}
+
+	const setDisplayName = (name) => {
+		return updateProfile(currentUser, {
+			displayName: name,
+		})
+	}
 
 	// add auth-state-observer here (somehow... 😈)
 	useEffect(() => {
@@ -56,8 +74,10 @@ const AuthContextProvider = ({ children }) => {
 		login,
 		logout,
 		signup,
-		
-		setCurrentUser,
+		resetPassword,
+		setDisplayName,
+		setEmail,
+		setPassword,
 	};
 
 	return (
