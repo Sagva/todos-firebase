@@ -10,10 +10,12 @@ const UploadImageDropzone = () => {
 
 	const onDrop = useCallback(async (acceptedFiles) => {
 		console.log("Got me zum files 😊", acceptedFiles);
-		if (acceptedFiles[0]) {
-			uploadImage(acceptedFiles[0]);
+		if (acceptedFiles.length > 0) {
+			acceptedFiles.map((oneImage) => {
+				console.log(`oneImage`, oneImage);
+				uploadImage(oneImage);
+			});
 		}
-		console.log("File is here!", acceptedFiles[0]);
 	}, []);
 
 	const {
@@ -26,7 +28,7 @@ const UploadImageDropzone = () => {
 	} = useDropzone({
 		accept: "image/gif, image/jpeg, image/png, image/webp",
 		onDrop,
-		maxFiles: 1,
+		// maxFiles: 1,
 	});
 
 	return (
