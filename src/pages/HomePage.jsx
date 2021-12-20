@@ -1,19 +1,21 @@
 import React from 'react'
-import Container from 'react-bootstrap/Container'
-import { useAuthContext } from '../contexts/AuthContext'
+import ImageGrid from '../components/ImageGrid'
+import UploadImageDropzone from '../components/UploadImageDropzone'
+import useImages from '../hooks/useImages'
 
 const HomePage = () => {
-	const { currentUser } = useAuthContext()
+	const imagesQuery = useImages()
 
 	return (
-		<Container className="py-3">
-			<h1>Welcome!</h1>
-			{
-				currentUser
-					? <p>You are logged in as {currentUser.email} 🥳!</p>
-					: <p>Anomymous haxxer</p>
-			}
-		</Container>
+		<>
+			<h1>Images</h1>
+
+			<ImageGrid query={imagesQuery} />
+
+			<hr className="my-3" />
+
+			<UploadImageDropzone />
+		</>
 	)
 }
 
