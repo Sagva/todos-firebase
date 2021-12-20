@@ -6,7 +6,7 @@ import { useDropzone } from "react-dropzone";
 import useUploadImage from "../hooks/useUploadImage";
 
 const UploadImageDropzone = () => {
-	const { uploadImage } = useUploadImage();
+	const { uploadImage, message, uploadProgress } = useUploadImage();
 
 	const onDrop = useCallback(async (acceptedFiles) => {
 		console.log("Got me zum files 😊", acceptedFiles);
@@ -39,7 +39,7 @@ const UploadImageDropzone = () => {
 		>
 			<input {...getInputProps()} />
 
-			{/* {uploadProgress && (
+			{uploadProgress && (
 				<ProgressBar
 					now={uploadProgress}
 					label={`${uploadProgress}%`}
@@ -48,7 +48,7 @@ const UploadImageDropzone = () => {
 					striped
 					variant="success"
 				/>
-			)} */}
+			)}
 
 			{isDragActive ? (
 				isDragAccept ? (
@@ -72,7 +72,7 @@ const UploadImageDropzone = () => {
 				</div>
 			)}
 
-			{/* {message && <Alert variant={message.type}>{message.msg}</Alert>} */}
+			{message && <Alert variant={message.type}>{message.msg}</Alert>}
 		</div>
 	);
 };

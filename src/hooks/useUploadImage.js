@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import { db, storage } from "../firebase";
@@ -14,8 +14,8 @@ const useUploadImage = () => {
 			return;
 		}
 		try {
-			
 
+            
 			// generate a uuid for the file
 			const uuid = uuidv4();
 
@@ -42,7 +42,6 @@ const useUploadImage = () => {
 				},
 				(e) => {
 					console.log("NOT so great success, fail!", e);
-
 					setMessage({
 						type: "warning",
 						msg: `Image failed to upload due to the following error: ${e.message}`,
@@ -70,6 +69,8 @@ const useUploadImage = () => {
 						type: "success",
 						msg: "Image successfully uploaded 🤩",
 					});
+
+					setUploadProgress(null);
 				}
 			);
 		} catch (e) {
@@ -78,10 +79,10 @@ const useUploadImage = () => {
 	};
 
 	return {
-        message,
-        uploadProgress,
-        uploadImage
-    }
-}
+		message,
+		uploadProgress,
+		uploadImage
+	};
+};
 
-export default useUploadImage
+export default useUploadImage;
